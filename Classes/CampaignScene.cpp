@@ -28,7 +28,6 @@ bool CampaignScene::init()
 	}
 
 	//touch init...
-	isMove = false;
 
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, 0, true);
 	this->setTouchEnabled(true);
@@ -96,43 +95,33 @@ bool CampaignScene::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 	return true;
 }
 
-void CampaignScene::ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent)
-{
-	isMove = true;
-}
 
 void CampaignScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
 {
 	CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize(); //gốc tọa độ ở góc dưới, bên trái
 
 	CCSprite* point = CCSprite::create("0Star.png");
-	int RECT_SIZE = point->getContentSize().width/2 + point->getContentSize().height/2;
-	int RECT_SIZE2 = RECT_SIZE/2;
+	int RECT_SIZE = point->getContentSize().width;
 
-	if(isMove == false)
-	{
-		int len = (sizeof(g_campaignLocations)/sizeof(*g_campaignLocations));
+	int len = (sizeof(g_campaignLocations)/sizeof(*g_campaignLocations));
 		
-		for (int i = 0; i < len; ++i)
+	for (int i = 0; i < len; ++i)
+	{
+		CCRect rect = CCRect(g_campaignLocations[i][0] - RECT_SIZE/2, visibleSize.height - (g_campaignLocations[i][1]) - RECT_SIZE/2, RECT_SIZE, RECT_SIZE);
+		if(rect.containsPoint(pTouch->getLocation()))
 		{
-			CCRect rect = CCRect(g_campaignLocations[i][0] - RECT_SIZE2, visibleSize.height - (g_campaignLocations[i][1]) - RECT_SIZE2, RECT_SIZE, RECT_SIZE);
-			if(rect.containsPoint(pTouch->getLocation()))
+			if(DataManager::GetInstance()->GetCurrenLevel() - 1 >= i)
 			{
-				if(DataManager::GetInstance()->GetCurrenLevel() - 1 >= i)
+				if (G_IsPlaySound)
 				{
-					if (G_IsPlaySound)
-					{
-						SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
-					}
-
-					gotoplay(i);
-					break;
+					SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
 				}
+
+				gotoplay(i);
+				break;
 			}
 		}
 	}
-
-	isMove = false;
 }
 
 void CampaignScene::back2Menu( CCObject* pSender )

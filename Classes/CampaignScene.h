@@ -28,7 +28,6 @@ public:
 
 	virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent);
-	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent);
 
 	// implement the "static node()" method manually
 	CREATE_FUNC(CampaignScene);
@@ -38,8 +37,6 @@ public:
 
 
 private:
-	bool isMove;
-
 	CCSprite* m_sprCampaign;
 	CCSprite* m_sprPointBorder; //current point
 	CCSprite* m_sprDialogPoint;
