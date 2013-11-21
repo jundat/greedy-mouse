@@ -30,6 +30,8 @@ char* FileOperation::ReadFile(const char* relativePath)
 	CCFileUtils* reader = CCFileUtils::sharedFileUtils();
 	std::string fullPath = reader->fullPathForFilename(relativePath);
 
+//	unsigned char* data = CCFileUtils::getFileData(relativePath);
+
 	FILE *fp = fopen(fullPath.c_str(), "w");
 	char* buf = new char[FILE_BUFFER_SIZE];
 
