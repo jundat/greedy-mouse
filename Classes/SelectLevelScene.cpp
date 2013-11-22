@@ -49,7 +49,7 @@ bool SelectLevelScene::init()
 	int numberOfColum = 5;
 	int numberOfRow = 4;
 
-	int currentLevel = DataManager::GetInstance()->GetCurrenLevel();
+	int currentLevel = DataManager::GetInstance()->GetCurrenLevel() - 1;
 	CCSprite* sprLevel = CCSprite::create("lockLevel.png");
 	int levelCouter = 0;
 	float dx = 60;
@@ -106,18 +106,6 @@ bool SelectLevelScene::init()
 
 bool SelectLevelScene::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 {
-	CCArray* children = mainSprite->getChildren();
-	for (int i = 0; i < children->count(); ++i)
-	{
-		CCSprite* spr = (CCSprite*)children->objectAtIndex(i);
-		int level = spr->getTag();
-
-		if(level >= 0 && spr->boundingBox().containsPoint(pTouch->getLocation()))
-		{
-			spr->setRotation(5);
-		}
-	}
-
 	isMoved = false;
 	return true;
 }
@@ -143,7 +131,6 @@ void SelectLevelScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
 
 		if(level >= 0 && spr->boundingBox().containsPoint(pTouch->getLocation()))
 		{
-			spr->setRotation(-5);
 			CCLOG("Select level %d", level);
 			GotoPlay(level);
 			break;

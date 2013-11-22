@@ -6,6 +6,7 @@
 #include "WinDialog.h"
 #include "LoseDialog.h"
 #include "SelectLevelScene.h"
+#include "NoMapLeftDialog.h"
 
 
 //level count from 1
@@ -138,6 +139,12 @@ void MainGameScene::showFailedLevel()
 
 void MainGameScene::GotoMenu()
 {
+	this->removeChildByTag(101);
+	if(this->getChildByTag(102) != NULL) //lose
+	{
+		this->removeChildByTag(102);
+	}
+
 	CCTransitionScene* transScene = CCTransitionFade::create(0.5f, SelectLevelScene::scene());
 	CCDirector::sharedDirector()->replaceScene(transScene);
 
@@ -162,6 +169,8 @@ void MainGameScene::Replay()
 
 void MainGameScene::Next()
 {
+	this->removeChildByTag(101); //win
+
 	int nextlevel = 1 + boardManager->curLevel;
 
 	if(nextlevel < Map::NUMBER_OF_MAP)
@@ -183,7 +192,11 @@ void MainGameScene::Next()
 	}
 	else
 	{
-		CCMessageBox("End of game, thank you for playing!", "INFO");
+		CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+		NoMapLeftDialog* dialog = new NoMapLeftDialog();
+		dialog->init();
+		dialog->InitTarget(this,-1);
+		this->addChild(dialog, 100, 102);
 	}
 }
 
