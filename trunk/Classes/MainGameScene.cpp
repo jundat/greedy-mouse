@@ -63,6 +63,16 @@ bool MainGameScene::init()
 
 void MainGameScene::initLevel(int level)
 {
+	if(level >= Map::NUMBER_OF_MAP)
+	{
+		CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+		NoMapLeftDialog* dialog = new NoMapLeftDialog();
+		dialog->init();
+		dialog->InitTarget(this,-1);
+		this->addChild(dialog, 100, 102);
+		return;
+	}
+
 	//Init Effect
 	lineEffectManager = CCNode::create();
 	centerPointEffectManager = CCNode::create();
