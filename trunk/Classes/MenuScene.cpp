@@ -1,13 +1,12 @@
 ﻿#include "Global.h"
 
 #include "MenuScene.h"
-
-//#include "HelpScene.h"
 #include "CreditsScene.h"
 #include "TutScene.h"
-//#include "OptionsScene.h"
-//#include "ScoresScene.h"
 #include "CampaignScene.h"
+
+#include "SelectLevelScene.h"
+
 #include "DataManager.h"
 #include "AchievementScene.h"
 #include <vector>
@@ -140,7 +139,7 @@ void MenuScene::playClicked(CCObject* pSender)
 	{
 		SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
 	}
-	CCTransitionScene* transScene = CCTransitionFade::create(0.3, CampaignScene::scene());
+	CCTransitionScene* transScene = CCTransitionFade::create(0.3, SelectLevelScene::scene());
 	CCDirector::sharedDirector()->replaceScene(transScene);
 }
 
