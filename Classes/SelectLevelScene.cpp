@@ -106,12 +106,26 @@ bool SelectLevelScene::init()
 
 bool SelectLevelScene::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 {
+	lastTouchPoint = pTouch->getLocation();
+
 	isMoved = false;
 	return true;
 }
 
 void SelectLevelScene::ccTouchMoved( CCTouch *pTouch, CCEvent *pEvent )
 {
+// 	int MIN_DELTA_MOVE = 20;
+// 	CCPoint p = pTouch->getLocation();
+// 	float dx = abs(p.x - lastTouchPoint.x);
+// 	float dir = dx / (p.x - lastTouchPoint.x);
+// 	if (dx >= MIN_DELTA_MOVE)
+// 	{
+// 		CCSize vs = CCDirector::sharedDirector()->getVisibleSize();
+// 		CCAction* move = CCEaseBackOut::create(CCMoveBy::create(8, ccp(dir * vs.width, 0)));
+// 		mainSprite->runAction(move);
+// 	}
+// 
+// 	lastTouchPoint = p;
 	isMoved = true;
 }
 
@@ -122,6 +136,8 @@ void SelectLevelScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
 		isMoved = false;
 		return;
 	}
+
+	int currentLevel = DataManager::GetInstance()->GetCurrenLevel() - 1;
 	//
 	CCArray* children = mainSprite->getChildren();
 	for (int i = 0; i < children->count(); ++i)
@@ -132,7 +148,11 @@ void SelectLevelScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
 		if(level >= 0 && spr->boundingBox().containsPoint(pTouch->getLocation()))
 		{
 			CCLOG("Select level %d", level);
-			GotoPlay(level);
+			if (level <= currentLevel)
+			{
+				GotoPlay(level);
+			}
+
 			break;
 		}
 	}

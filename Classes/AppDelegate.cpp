@@ -64,7 +64,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 
 	// create a scene. it's an autorelease object
-	CCScene *pScene = SelectLevelScene::scene();
+	CCScene *pScene = SplashScene::scene();
 
 	// run
 	pDirector->runWithScene(pScene);
