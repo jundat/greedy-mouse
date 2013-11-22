@@ -35,7 +35,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 #ifdef WIN32
 	eglView->setFrameSize(1280, 768);
-	eglView->setFrameZoomFactor(0.5);
+	eglView->setFrameZoomFactor(0.7);
 #endif
 	
 	pDirector->setOpenGLView(eglView);
