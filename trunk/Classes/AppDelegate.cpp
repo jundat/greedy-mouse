@@ -12,6 +12,7 @@
 #include "DataManager.h"
 #include "CampaignScene.h"
 #include "MenuScene.h"
+#include "SelectLevelScene.h"
 
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
@@ -63,7 +64,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 
 	// create a scene. it's an autorelease object
-	CCScene *pScene = SplashScene::scene();
+	CCScene *pScene = SelectLevelScene::scene();
 
 	// run
 	pDirector->runWithScene(pScene);

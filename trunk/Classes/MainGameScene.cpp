@@ -5,6 +5,7 @@
 
 #include "WinDialog.h"
 #include "LoseDialog.h"
+#include "SelectLevelScene.h"
 
 
 //level count from 1
@@ -137,7 +138,7 @@ void MainGameScene::showFailedLevel()
 
 void MainGameScene::GotoMenu()
 {
-	CCTransitionScene* transScene = CCTransitionFade::create(0.5f, CampaignScene::scene());
+	CCTransitionScene* transScene = CCTransitionFade::create(0.5f, SelectLevelScene::scene());
 	CCDirector::sharedDirector()->replaceScene(transScene);
 
 	//SimpleAudioEngine::sharedEngine()->stopBackgroundMusic(false);

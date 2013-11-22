@@ -9,7 +9,7 @@ USING_NS_CC;
 #include <string>
 
 Map* Map::instance = 0;
-int Map::NUMBER_OF_MAP = 11;
+int Map::NUMBER_OF_MAP = 14;
 int Map::MAP_COL = 11;
 int Map::MAP_ROW = 8;
 

@@ -27,6 +27,11 @@ bool SelectLevelScene::init()
 		return false;
 	}
 	
+	//touch init...
+	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, 0, true);
+	this->setTouchEnabled(true);
+	isMoved = false;
+
 	CCSize vs = CCDirector::sharedDirector()->getVisibleSize();
 
 	//background
@@ -36,9 +41,9 @@ bool SelectLevelScene::init()
 
 	//buffer
 	mainSprite = CCSprite::create();
-	mainSprite->setPosition(ccp(vs.width/2, vs.height/2));
+	mainSprite->setPosition(CCPointZero);
 	this->addChild(mainSprite);
-
+	
 	//level pack
 	int maxlevel = Map::NUMBER_OF_MAP;
 	int numberOfColum = 5;
@@ -47,13 +52,15 @@ bool SelectLevelScene::init()
 	int currentLevel = DataManager::GetInstance()->GetCurrenLevel();
 	CCSprite* sprLevel = CCSprite::create("lockLevel.png");
 	int levelCouter = 0;
-	float dx = 80;
-	float dy = 50;
-	float top = vs.height/2 + (numberOfRow / 2.0 - 0.5)*(sprLevel->getContentSize().height + dy) / 2.0;
-	float left = vs.width/2 - (numberOfColum / 2.0 - 0.5)*(sprLevel->getContentSize().width + dx) / 2.0;
-	float deltax = sprLevel->getContentSize().width + dx;
-	float deltay = sprLevel->getContentSize().height + dy;
-
+	float dx = 60;
+	float dy = 40;
+	float w = sprLevel->getContentSize().width;
+	float h = sprLevel->getContentSize().height;
+	float top = vs.height/2 + (numberOfRow/2.0-0.5) * h + (numberOfRow-1)/2.0 * dy;
+	float left = vs.width/2 - (numberOfColum/2.0 - 0.5) * w - (numberOfColum-1)/2.0 * dx;
+	float deltax = w + dx;
+	float deltay = h + dy;
+	
 	for (int i = 0; i < numberOfRow; ++i)
 	{
 		for (int j = 0; j < numberOfColum; ++j)
@@ -66,9 +73,9 @@ bool SelectLevelScene::init()
 			{
 				sprLevel = CCSprite::create("unlockLevel.png");
 				sprLevel->setPosition(ccp(x, y));
-				mainSprite->addChild(sprLevel);
+				mainSprite->addChild(sprLevel, 0, lv);
 
-				int star = DataManager::GetInstance()->GetLevelStar(i + 1);
+				int star = DataManager::GetInstance()->GetLevelStar(lv + 1);
 				CCString* _buf = CCString::createWithFormat("%dStar.png", star); //1 sai lầm cực kỳ lớn khi gõ tên "Star" thành "star"
 
 				CCSprite* sprStar = CCSprite::create(_buf->getCString());
@@ -79,7 +86,7 @@ bool SelectLevelScene::init()
 			{
 				sprLevel = CCSprite::create("unlockLevel.png");
 				sprLevel->setPosition(ccp(x, y));
-				mainSprite->addChild(sprLevel);
+				mainSprite->addChild(sprLevel, 0, lv);
 
 				CCSprite* sprStar = CCSprite::create("0Star.png");
 				sprStar->setPosition(ccp(x, y));
@@ -89,10 +96,67 @@ bool SelectLevelScene::init()
 			{
 				sprLevel = CCSprite::create("lockLevel.png");
 				sprLevel->setPosition(ccp(x, y));
-				mainSprite->addChild(sprLevel);
+				mainSprite->addChild(sprLevel, 0, lv);
 			}
 		}
 	}
 	
 	return true;
+}
+
+bool SelectLevelScene::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
+{
+	CCArray* children = mainSprite->getChildren();
+	for (int i = 0; i < children->count(); ++i)
+	{
+		CCSprite* spr = (CCSprite*)children->objectAtIndex(i);
+		int level = spr->getTag();
+
+		if(level >= 0 && spr->boundingBox().containsPoint(pTouch->getLocation()))
+		{
+			spr->setRotation(5);
+		}
+	}
+
+	isMoved = false;
+	return true;
+}
+
+void SelectLevelScene::ccTouchMoved( CCTouch *pTouch, CCEvent *pEvent )
+{
+	isMoved = true;
+}
+
+void SelectLevelScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
+{
+	if (isMoved)
+	{
+		isMoved = false;
+		return;
+	}
+	//
+	CCArray* children = mainSprite->getChildren();
+	for (int i = 0; i < children->count(); ++i)
+	{
+		CCSprite* spr = (CCSprite*)children->objectAtIndex(i);
+		int level = spr->getTag();
+
+		if(level >= 0 && spr->boundingBox().containsPoint(pTouch->getLocation()))
+		{
+			spr->setRotation(-5);
+			CCLOG("Select level %d", level);
+			GotoPlay(level);
+			break;
+		}
+	}
+}
+
+void SelectLevelScene::GotoPlay( int level )
+{
+	CCLOG("[info] Start create MainGameScene");
+	CCScene* maingame = MainGameScene::scene(level);
+	CCLOG("[info] End create MainGameScene");
+
+	CCScene* transScene = CCTransitionFade::create(0.3, maingame);
+	CCDirector::sharedDirector()->replaceScene(transScene);
 }
