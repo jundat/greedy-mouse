@@ -29,6 +29,7 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
      ../../Classes/TutScene.cpp  \
      ../../Classes/WinDialog.cpp  \
      ../../Classes/SelectLevelScene.cpp  \
+     ../../Classes/NoMapLeftDialog.cpp  \
 
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

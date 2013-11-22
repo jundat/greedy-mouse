@@ -116,25 +116,8 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 {
 	MainGameScene *a = (MainGameScene *)this->getParent();
 
-// 	if(a->sprReplay->boundingBox().containsPoint(touch->getLocation()))
-// 	{
-// 		a->effect->RemoveAllEff();
-// 		a->effect->FadeOutIn();
-// 		resetBoard(true);
-// 		return ;
-// 	}
-// 	else
-// 	if(a->sprGoMenu->boundingBox().containsPoint(touch->getLocation()))
-// 	{
-// 		CCScene* transScene = CCTransitionFade::create(0.5, CampaignScene::scene());
-//		CCDirector::sharedDirector()->replaceScene(transScene);
-// 		return;
-// 	}
-
-
 	for(int i = 0 ; i < this->getChildren()->count(); i++)
 	{
-
 		MapItem *mapItem = (MapItem *)this->getChildren()->objectAtIndex(i);
 		if(mapItem)
 		{
@@ -146,6 +129,7 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 				{
 					if(mapItem->getCurStatus() == sNormal)
 					{
+
 #pragma region Main Logic Game
 						switch (status)
 						{
@@ -153,13 +137,11 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 							{
 								if(mapItem->getId() == Start)
 								{
-
 									if (G_IsPlaySound)
 									{
 										SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
 									}
 
-									//curNumMove--;
 									MainGameScene *a = (MainGameScene *)this->getParent();
 									a->updateTextEnergy();
 
@@ -180,17 +162,18 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 							break;
 						case STATUS_PLAYING:
 							{
+								//active this item
 								addNewShadowEffect(mapItem->getPosition());
 								mapItem->makeItemActive();
 
 #pragma region Switch ID item
+								//extra processing
 								switch (mapItem->getId())
 								{
 								case None:
 									break;
+
 								case Lock:
-
-
 									if (G_IsPlaySound)
 									{
 										SimpleAudioEngine::sharedEngine()->playEffect("sfx_goalcomplete.wav");
@@ -198,6 +181,7 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 
 									addNewLineEffect(mapItem->getPosition(),lastItemSelected->getPosition());
 									break;
+
 								case Bridge: //-----------------------------------------------------------------------------------
 									{
 										//phamtanlong
@@ -211,16 +195,13 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 											SimpleAudioEngine::sharedEngine()->playEffect("sfx_goalcomplete.wav");
 										}
 
-										MapItem *nextItem = getItemAtPos(mapItem->getDesRowForIt(),mapItem->getDesColForIt());	
-
-
-										//lastItemSelected = nextItem;
+										MapItem *nextItem = getItemAtPos(mapItem->getDesRowForIt(),mapItem->getDesColForIt());
 
 										if(nextItem == NULL)
 										{
 											CCLog("Null next item");
 										}
-										
+
 
 										addNewShadowEffect(nextItem->getPosition());
 
@@ -231,6 +212,29 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 										nextItem->makeItemActive();
 										lastItemSelected =  nextItem;
 										
+										if(lastItemSelected->getIDForIt() == Finish)
+										{
+											if(curNumMove >= 0)
+											{
+												//Add layer WIN
+												MainGameScene* mgs = (MainGameScene*)this->getParent();
+												mgs->SetTouchEnable(false);
+
+												status = STATUS_FINISH;
+												DataManager::GetInstance()->SetLevelStar(curLevel + 1,curNumStar);
+												DataManager::GetInstance()->SetCurrentLevel(curLevel + 2);
+
+												MainGameScene *a = (MainGameScene *)this->getParent();
+
+												a->showCompletedLevel(curLevel,curNumStar);
+											}
+										}
+										else
+										{
+											status = STATUS_PLAYING;
+										}
+
+
 										//phamtanlong
 										if(nextItem != NULL && nextItem->getId() > 0)
 										{
@@ -246,45 +250,25 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 												curNumStar++;
 												a->UpdateStar(curNumStar);
 												break;
+
+											case Teleport:
+												status = STATUS_CHOOSE_START_ITEM;
+												CCLog("Touched teleport make choose start item");
+												break;
 											}
 											//break;
 										}
 										//end
 
-
-										if(lastItemSelected->getIDForIt() == Finish)
-										{
-											if(curNumMove >= 0)
-											{
-												//Add layer WIN
-												MainGameScene* mgs = (MainGameScene*)this->getParent();
-												mgs->SetTouchEnable(false);
-
-												status = STATUS_FINISH;
-												DataManager::GetInstance()->SetLevelStar(curLevel + 1,curNumStar);
-												DataManager::GetInstance()->SetCurrentLevel(curLevel + 2);
-
-
-												MainGameScene *a = (MainGameScene *)this->getParent();
-
-												a->showCompletedLevel(curLevel,curNumStar);
-
-											}
-										}
-										else
-										{
-											status = STATUS_PLAYING;
-										}
-
-										mapItem = NULL;
-										return;
-
+ 
+ 										mapItem = NULL;
+ 										return;
 									}
 
 									break;
+
 								case Energy:
 									{
-
 										if (G_IsPlaySound)
 										{
 											SimpleAudioEngine::sharedEngine()->playEffect("sfx_goalcomplete.wav");
@@ -300,6 +284,7 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 									}
 									
 									break;
+
 								case Key:
 									{
 
@@ -391,9 +376,9 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 										}
 									}
 									break;
+
 								case Normal:
 									{
-
 										if (G_IsPlaySound)
 										{
 											SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
@@ -404,16 +389,14 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 										MainGameScene *a = (MainGameScene *)this->getParent();
 										a->updateTextEnergy();
 
-
 										addNewLineEffect(mapItem->getPosition(),lastItemSelected->getPosition());
 									}
 									
 									break;
-								case Star:
 
+								case Star:
 									if(curNumStar >= 0 && curNumStar <=2)
 									{
-
 										if (G_IsPlaySound)
 										{
 											SimpleAudioEngine::sharedEngine()->playEffect("sfx_goalcomplete.wav");
@@ -427,10 +410,11 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 										a->UpdateStar(curNumStar);
 										addNewLineEffect(mapItem->getPosition(),lastItemSelected->getPosition());
 									}
+
 									break;
+
 								case Start:
 									{
-
 										if (G_IsPlaySound)
 										{
 											SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
@@ -443,9 +427,9 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 									}
 									
 									break;
+
 								case Teleport:
 									{
-
 										if (G_IsPlaySound)
 										{
 											SimpleAudioEngine::sharedEngine()->playEffect("sfx_goalcomplete.wav");
@@ -459,12 +443,11 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 										//1. Set status is CHoose_Start_Item => Make player choose next start item
 										status = STATUS_CHOOSE_START_ITEM;
 
-
 										CCLog("Touched teleport make choose start item");
-
-										
 									}
+
 									break;
+
 								case Finish:
 									{
 										curNumMove--;
@@ -531,7 +514,6 @@ void BoardManager::ccTouchEnded(CCTouch* touch, CCEvent* event)
 							MainGameScene *a = (MainGameScene *)this->getParent();
 
 							a->showFailedLevel();
-
 						}
 
 #pragma endregion
