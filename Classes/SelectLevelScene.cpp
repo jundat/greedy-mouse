@@ -30,7 +30,6 @@ bool SelectLevelScene::init()
 	//touch init...
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, 0, true);
 	this->setTouchEnabled(true);
-	isMoved = false;
 
 	CCSize vs = CCDirector::sharedDirector()->getVisibleSize();
 
@@ -56,7 +55,7 @@ bool SelectLevelScene::init()
 	float dy = 40;
 	float w = sprLevel->getContentSize().width;
 	float h = sprLevel->getContentSize().height;
-	float top = vs.height/2 + (numberOfRow/2.0-0.5) * h + (numberOfRow-1)/2.0 * dy;
+	float top = -40 + vs.height/2 + (numberOfRow/2.0-0.5) * h + (numberOfRow-1)/2.0 * dy;
 	float left = vs.width/2 - (numberOfColum/2.0 - 0.5) * w - (numberOfColum-1)/2.0 * dx;
 	float deltax = w + dx;
 	float deltay = h + dy;
@@ -100,43 +99,28 @@ bool SelectLevelScene::init()
 			}
 		}
 	}
+
+	//back button...
+	CCMenuItemImage* btnBack = CCMenuItemImage::create("buttomMenu.png", "buttomMenuPr.png", this, menu_selector(SelectLevelScene::BackToMenu));
+	btnBack->setPosition(ccp(btnBack->getContentSize().width/2 - vs.width/2, btnBack->getContentSize().height/2 - vs.height/2));
+
+	CCMenu* menu = CCMenu::create(btnBack, NULL); //
+	this->addChild(menu, 0);
 	
 	return true;
 }
 
 bool SelectLevelScene::ccTouchBegan( CCTouch *pTouch, CCEvent *pEvent )
 {
-	lastTouchPoint = pTouch->getLocation();
-
-	isMoved = false;
 	return true;
 }
 
 void SelectLevelScene::ccTouchMoved( CCTouch *pTouch, CCEvent *pEvent )
 {
-// 	int MIN_DELTA_MOVE = 20;
-// 	CCPoint p = pTouch->getLocation();
-// 	float dx = abs(p.x - lastTouchPoint.x);
-// 	float dir = dx / (p.x - lastTouchPoint.x);
-// 	if (dx >= MIN_DELTA_MOVE)
-// 	{
-// 		CCSize vs = CCDirector::sharedDirector()->getVisibleSize();
-// 		CCAction* move = CCEaseBackOut::create(CCMoveBy::create(8, ccp(dir * vs.width, 0)));
-// 		mainSprite->runAction(move);
-// 	}
-// 
-// 	lastTouchPoint = p;
-	isMoved = true;
 }
 
 void SelectLevelScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
 {
-	if (isMoved)
-	{
-		isMoved = false;
-		return;
-	}
-
 	int currentLevel = DataManager::GetInstance()->GetCurrenLevel() - 1;
 	//
 	CCArray* children = mainSprite->getChildren();
@@ -150,6 +134,10 @@ void SelectLevelScene::ccTouchEnded( CCTouch *pTouch, CCEvent *pEvent )
 			CCLOG("Select level %d", level);
 			if (level <= currentLevel)
 			{
+				if (G_IsPlaySound)
+				{
+					SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
+				}
 				GotoPlay(level);
 			}
 
@@ -166,4 +154,14 @@ void SelectLevelScene::GotoPlay( int level )
 
 	CCScene* transScene = CCTransitionFade::create(0.3, maingame);
 	CCDirector::sharedDirector()->replaceScene(transScene);
+}
+
+void SelectLevelScene::BackToMenu( CCObject* pSender )
+{
+	if (G_IsPlaySound)
+	{
+		SimpleAudioEngine::sharedEngine()->playEffect("sfx_button.wav");
+	}
+
+	CCDirector::sharedDirector()->replaceScene(CCTransitionFade::create(0.3, MenuScene::scene()));
 }

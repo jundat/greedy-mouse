@@ -11,14 +11,12 @@ public:
 	static CCScene* scene();
 	CREATE_FUNC(SelectLevelScene);
 
-	CCPoint lastTouchPoint;
-	bool isMoved;
-
 	virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent);
 
 	void GotoPlay( int level );
+	void BackToMenu(CCObject* pSender);
 
 private:
 	CCSprite* mainSprite;
